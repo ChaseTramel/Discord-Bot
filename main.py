@@ -41,10 +41,10 @@ def checkAll():
     updated = False
 
     for name, module in {
-        "Ghost": ghost,
+        #"Ghost": ghost,
         "Mastodon": mastodon,
-        "Reddit": reddit,
-        "Bluesky": bluesky
+        # "Reddit": reddit,
+        # "Bluesky": bluesky
     }.items():
         try:
             url = module.get_latest_post(config[name.lower()], last.get(name))
