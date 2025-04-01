@@ -41,9 +41,9 @@ def checkAll():
     updated = False
 
     for name, module in {
-        #"Ghost": ghost,
-        "Mastodon": mastodon,
-        # "Reddit": reddit,
+        # "Ghost": ghost,
+        #"Mastodon": mastodon,
+        "Reddit": reddit,
         # "Bluesky": bluesky
     }.items():
         try:
