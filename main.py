@@ -27,17 +27,12 @@ def saveLastPosts(data):
         json.dump(data, f)
 
 def postDiscord(webhook_url, platform, url):
-    try:
-        data = {
-            "content": f"I posted on **{platform}**. Go like, comment, and share, if you will!",
-            "embeds": [{"title": f"New post on {platform}", "url": url}]
-        }
-        import requests
-        response = requests.post(webhook_url, json=data)
-        if response.status_code != 204:
-            raise Exception(f"Discord webhook error: {response.status_code} - {response.text}")
-    except Exception as e:
-        logging.error(f"Discord error: {e}")
+    import requests
+    data = {
+        "content": f"✅ Hello from your bot! Platform: {platform}\nLink: {url}"
+    }
+    r = requests.post(webhook_url, json=data)
+    print("Discord response:", r.status_code, r.text)
 
 def checkAll():
     config = loadConfig()
