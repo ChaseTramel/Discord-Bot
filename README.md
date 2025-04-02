@@ -13,7 +13,7 @@ It checks Ghost, Mastodon, Reddit, and Bluesky every few minutes and sends an em
 -   Skips reposts automatically using `last_posts.json`
 -   Adds a fun randomized message each time
 
-## Step-Up
+## Set Up
 
 1. Clone this repo.
 2. Copy `config.sample.json` to `config.json` .
