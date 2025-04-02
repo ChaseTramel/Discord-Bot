@@ -1,4 +1,5 @@
 import praw
+from bs4 import BeautifulSoup
 
 
 def get_latest_post(config, last_url=None):
@@ -12,11 +13,32 @@ def get_latest_post(config, last_url=None):
 
     user = reddit.redditor(config["username"])
     for submission in user.submissions.new(limit=5):
-        url = submission.url  # Direct link (e.g. to image or external site)
-        permalink = f"https://reddit.com{submission.permalink}"  # Reddit post URL
+        permalink = f"https://reddit.com{submission.permalink}"
 
-        # Use permalink to avoid linking just to external URLs
-        if permalink != last_url:
-            return permalink
+        if permalink == last_url:
+            continue  # skip if already posted
+
+        title = submission.title
+
+        if submission.is_self:
+            raw_text = submission.selftext_html or ""
+            text = BeautifulSoup(raw_text, "html.parser").get_text().strip()
+        else:
+            text = ""
+
+        if len(text) > 300:
+            text = text[:297] + "..."
+
+        image = None
+    
+        preview = getattr(submission, "preview", None)
+        if preview and "images" in preview:
+            images = preview["images"]
+            if images:
+                image = images[0]["source"]["url"]
+
+        footer = f"👽 r/{submission.subreddit.display_name} via Reddit"
+
+        return (permalink, title, text or None, image, footer)
 
     return None

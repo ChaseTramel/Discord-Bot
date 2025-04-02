@@ -50,14 +50,17 @@ PLATFORM_STYLE = {
     }
 }
 
-def buildEmbed(platform, title=None, url=None, description=None, image=None):
+def buildEmbed(platform, title=None, url=None, description=None, image=None, footer_text=None):
     style = PLATFORM_STYLE.get(platform, {})
+    emoji = style.get("emoji", "")
+
     embed = {
-        "title": title or f"New {platform} Post",
+        "title": f"{emoji} {title or f'New {platform} Post'}",
         "url": url,
         "description": description or f"Check out the latest {platform} post!",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "footer": {
-            "text": f"{style.get('emoji', '')} Posted via {platform}"
+            "text": footer_text or f"{emoji} Posted via {platform}"
         },
         "color": style.get("color", 0xCCCCCC)
     }
@@ -67,10 +70,12 @@ def buildEmbed(platform, title=None, url=None, description=None, image=None):
 
     return embed
 
-def postDiscord(webhook_url, platform, url, title=None, description=None, image=None):
+
+
+def postDiscord(webhook_url, platform, url, title=None, description=None, image=None, footer_text=None):
     import requests
     try:
-        embed = buildEmbed(platform, title=title, url=url, description=description, image=image)
+        embed = buildEmbed(platform, title=title, url=url, description=description, image=image, footer_text=footer_text)
 
         data = {
             "content": f"I posted on **{platform}**. Go like, comment, and share, if you will!",
@@ -85,6 +90,7 @@ def postDiscord(webhook_url, platform, url, title=None, description=None, image=
     except Exception as e:
         print(f"Discord error: {e}")
 
+
 def checkAll():
     config = loadConfig()
     last = loadLastPosts()
@@ -92,9 +98,9 @@ def checkAll():
 
     for name, module in {
         # "Ghost": ghost,
-        "Mastodon": mastodon,
+        # "Mastodon": mastodon,
         # "Reddit": reddit,
-        # "Bluesky": bluesky
+        "Bluesky": bluesky
     }.items():
         try:
             result = module.get_latest_post(config[name.lower()], last.get(name))
@@ -102,10 +108,13 @@ def checkAll():
 
             if result:
                 if isinstance(result, tuple):
-                    url, title, description, image = result
+                    if len(result) == 5:
+                        url, title, description, image, footer_text = result
+                    else:
+                        url, title, description, image = result
+                        footer_text = None
                 else:
-                    url, title, description, image = result, None, None, None
-
+                    url, title, description, image, footer_text = result, None, None, None, None
                 postDiscord(config["discord_webhook"], name, url, title, description, image)
                 last[name] = url
                 updated = True
