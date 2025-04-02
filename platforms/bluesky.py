@@ -4,29 +4,38 @@ from atproto import Client
 def get_latest_post(config, last_url=None):
     client = Client()
     client.login(config["handle"], config["app_password"])
+    handle = config["handle"]
 
     feed = client.app.bsky.feed.get_author_feed({
-        "actor": config["handle"],
+        "actor": handle,
         "limit": 10
     })
 
-    print("Fetched posts:")
     for post in feed.feed:
-        # print("---")
-        # print("URI:", post.post.uri)
-        # print("Reason type:", getattr(post.reason, '__class__', type(None)).__name__)
-        # print("Reply:", post.reply)
-        # print("Text:", getattr(post.post.record, 'text', '[no text]'))
-
-        if post.reason or post.reply:
+        if post.reply or post.reason:
             continue
+
+        record = post.post.record
+        text = getattr(record, "text", "").strip()
+
+        if len(text) > 300:
+            text = text[:297] + "..."
 
         uri = post.post.uri
         rkey = uri.split("/")[-1]
-        handle = config["handle"]
         post_url = f"https://bsky.app/profile/{handle}/post/{rkey}"
+        did = post.post.author.did
 
-        if post_url != last_url:
-            return post_url
+        image = None
+        embed = getattr(record, "embed", None)
+        if embed and hasattr(embed, "images"):
+            images = getattr(embed, "images", [])
+            if isinstance(images, list) and len(images) > 0:
+                blob = images[0].image
+                if blob and hasattr(blob, "ref"):
+                    cid = blob.ref.link
+                    image = f"https://cdn.bsky.app/img/feed_fullsize/plain/{did}/{cid}@jpeg"
+
+        return (post_url, None, text, image)
 
     return None
