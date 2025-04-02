@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import time
+from datetime import datetime
 
 import schedule
 
@@ -26,13 +27,49 @@ def saveLastPosts(data):
     with open(STATE_PATH, 'w') as f:
         json.dump(data, f)
 
-def postDiscord(webhook_url, platform, url):
-    import requests
-    data = {
-        "content": f"✅ Hello from your bot! Platform: {platform}\nLink: {url}"
+
+
+from datetime import datetime
+
+
+def buildEmbed(platform, title=None, url=None, description=None, image=None):
+    embed = {
+        "title": title or f"New {platform} Post",
+        "description": description or f"Check out the latest {platform} post!",
+        "url": url,
+        "timestamp": datetime.utcnow().isoformat(),
+        "footer": {
+            "text": f"Posted via {platform}"
+        }
     }
-    r = requests.post(webhook_url, json=data)
-    print("Discord response:", r.status_code, r.text)
+
+    if image:
+        embed["thumbnail"] = {"url": image}
+
+    return embed
+
+
+
+def postDiscord(webhook_url, platform, url, title=None, description=None, image=None):
+    import requests
+    try:
+        embed = buildEmbed(platform, title=title, url=url, description=description, image=image)
+
+        data = {
+            "content": f"I posted on **{platform}**. Go like, comment, and share, if you will!",
+            "embeds": [embed]
+        }
+    
+        import jsonprint("Sending to Discord:\n", json.dumps(data, indent=2))
+
+        response = requests.post(webhook_url, json=data)
+        if response.status_code not in [200, 204]:
+            raise Exception(f"Discord webhook error: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Discord error: {e}")
+
+
+
 
 def checkAll():
     config = loadConfig()
@@ -41,10 +78,10 @@ def checkAll():
     updated = False
 
     for name, module in {
-        # "Ghost": ghost,
-        #"Mastodon": mastodon,
+        "Ghost": ghost,
+        "Mastodon": mastodon,
         "Reddit": reddit,
-        # "Bluesky": bluesky
+        "Bluesky": bluesky
     }.items():
         try:
             url = module.get_latest_post(config[name.lower()], last.get(name))
