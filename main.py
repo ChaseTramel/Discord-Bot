@@ -56,7 +56,6 @@ def buildEmbed(platform, title=None, url=None, description=None, image=None):
         "title": title or f"New {platform} Post",
         "url": url,
         "description": description or f"Check out the latest {platform} post!",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
         "footer": {
             "text": f"{style.get('emoji', '')} Posted via {platform}"
         },
@@ -92,8 +91,8 @@ def checkAll():
     updated = False
 
     for name, module in {
-        "Ghost": ghost,
-        # "Mastodon": mastodon,
+        # "Ghost": ghost,
+        "Mastodon": mastodon,
         # "Reddit": reddit,
         # "Bluesky": bluesky
     }.items():
