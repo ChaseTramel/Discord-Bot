@@ -44,4 +44,5 @@ _Your_ `config.json` is ignored by Git. Don't push your API keys!
 
 ## Conclusion
 
-This was just a simple evening project for me. Thank you.
+This was just a simple evening project for me. I will not be expanding it beyond what serves my own use, but I will review pull requests that are made. Thank you.
+
