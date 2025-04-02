@@ -35,7 +35,7 @@ python main.py
 6. (optional) To add auto-start on reboot, use `launch.sh` to start the bot and log output. Add it to `crontab` like this:
 
 ```bash
-@reboot /path/to/Discord-Bot/launch.sh
+@reboot /path/to/intercom-discord-bot/launch.sh
 ```
 
 ## Notes
