@@ -50,6 +50,29 @@ PLATFORM_STYLE = {
     }
 }
 
+import random
+
+POST_INTRO_FIRST = [
+    "I posted on **{platform}**.",
+    "A post just went up on **{platform}**.",
+    "Something new just dropped on **{platform}**.",
+    "Beep beep! New post on **{platform}**!",
+    "Heads up! There's a new thing on **{platform}**.",
+    "Another one landed on **{platform}**.",
+]
+
+POST_INTRO_SECOND = [
+    "Go like, comment, and share, if you will!",
+    "Please share, comment, and like!",
+    "Check it out and spread the word!",
+    "Give it a boost if you'd like.",
+    "Let me know what you think!",
+    "You know what to do.",
+    "Public engagement helps!",
+]
+
+
+
 def buildEmbed(platform, title=None, url=None, description=None, image=None, footer_text=None):
     style = PLATFORM_STYLE.get(platform, {})
     emoji = style.get("emoji", "")
@@ -77,10 +100,15 @@ def postDiscord(webhook_url, platform, url, title=None, description=None, image=
     try:
         embed = buildEmbed(platform, title=title, url=url, description=description, image=image, footer_text=footer_text)
 
+        first = random.choice(POST_INTRO_FIRST).format(platform=platform)
+        second = random.choice(POST_INTRO_SECOND)
+        content = f"{first} {second}"
+
         data = {
-            "content": f"I posted on **{platform}**. Go like, comment, and share, if you will!",
+            "content": content,
             "embeds": [embed]
         }
+
 
         print("Sending to Discord:\n", json.dumps(data, indent=2))
 
