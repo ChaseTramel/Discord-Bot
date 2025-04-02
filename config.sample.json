@@ -1,0 +1,27 @@
+{
+	"discord_webhook": "https://discord.com/api/webhooks/your_webhook_url",
+	"interval_minutes": 15,
+
+	"ghost": {
+		"url": "https://your-ghost-blog.com",
+		"content_api_key": "YOUR_GHOST_CONTENT_API_KEY"
+	},
+
+	"mastodon": {
+		"instance": "https://mastodon.social",
+		"access_token": "YOUR_MASTODON_ACCESS_TOKEN"
+	},
+
+	"reddit": {
+		"client_id": "YOUR_REDDIT_CLIENT_ID",
+		"client_secret": "YOUR_REDDIT_CLIENT_SECRET",
+		"username": "your_reddit_username",
+		"password": "your_reddit_password",
+		"user_agent": "your-bot-name/0.1 by your_username"
+	},
+
+	"bluesky": {
+		"handle": "yourhandle.bsky.social",
+		"app_password": "YOUR_BLUESKY_APP_PASSWORD"
+	}
+}
