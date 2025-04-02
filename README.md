@@ -1,7 +1,7 @@
 # Discord Bot : Starship Odyssey Intercom
 
-I made this tiny Python bot for my personal use. It auto-posts your latest content to a Discord channel using a webhook.
-It checks Ghost, Mastodon, Reddit, and Bluesky every few minutes and sends a link with a little personality.
+I made this super tiny Python bot for my personal use. It auto-posts your latest content to a Discord channel using a webhook.
+It checks Ghost, Mastodon, Reddit, and Bluesky every few minutes and sends an embed to Discord that has some variation so people don't tune it out.
 
 ---
 
@@ -13,10 +13,10 @@ It checks Ghost, Mastodon, Reddit, and Bluesky every few minutes and sends a lin
 -   Skips reposts automatically using `last_posts.json`
 -   Adds a fun randomized message each time
 
-## Step-Up
+## Set Up
 
 1. Clone this repo.
-2. Copy `config.sample.json` → `config.json` .
+2. Copy `config.sample.json` to `config.json` .
 3. Fill in your API keys and info .
 4. Install dependencies.
 
@@ -35,7 +35,7 @@ python main.py
 6. (optional) To add auto-start on reboot, use `launch.sh` to start the bot and log output. Add it to `crontab` like this:
 
 ```bash
-@reboot /path/to/Discord-Bot/launch.sh
+@reboot /path/to/intercom-discord-bot/launch.sh
 ```
 
 ## Notes
@@ -44,4 +44,5 @@ _Your_ `config.json` is ignored by Git. Don't push your API keys!
 
 ## Conclusion
 
-This was just a simple evening project for me. Thank you.
+This was just a simple evening project for me. I will not be expanding it beyond what serves my own use, but I will review pull requests that are made. Thank you.
+
