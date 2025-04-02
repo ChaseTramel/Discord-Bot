@@ -23,7 +23,9 @@ def get_latest_post(config, last_url=None):
         post = posts[0]
         url = post.get("url") or f"{base_url}/{post['slug']}/"
         title = post.get("title", "New blog post")
-        excerpt = post.get("custom_excerpt") or post.get("excerpt") or ""
+        excerpt = (post.get("custom_excerpt") or post.get("excerpt") or "").strip()
+        if len(excerpt) > 300:
+            excerpt = excerpt[:297] + "..."
         image = post.get("feature_image")
 
         if url != last_url:

@@ -29,18 +29,22 @@ def saveLastPosts(data):
 
 PLATFORM_STYLE = {
     "Ghost": {
+        "emoji": "👻",
         "color": 0xF6F6F6,
         "icon": "https://ghost.org/images/ghost-orb-1.png"
     },
     "Mastodon": {
+        "emoji": "🐘",
         "color": 0x6364FF,
         "icon": "https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg"
     },
     "Reddit": {
+        "emoji": "👽",
         "color": 0xFF4500,
         "icon": "https://www.redditinc.com/assets/images/site/reddit-logo.png"
     },
     "Bluesky": {
+        "emoji": "🌤️",
         "color": 0x4C9EEB,
         "icon": "https://bsky.app/favicon.ico"
     }
@@ -54,14 +58,13 @@ def buildEmbed(platform, title=None, url=None, description=None, image=None):
         "description": description or f"Check out the latest {platform} post!",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "footer": {
-            "text": f"Posted via {platform}",
-            "icon_url": style.get("icon")
+            "text": f"{style.get('emoji', '')} Posted via {platform}"
         },
         "color": style.get("color", 0xCCCCCC)
     }
 
     if image:
-        embed["thumbnail"] = {"url": image}
+        embed["image"] = {"url": image}
 
     return embed
 
