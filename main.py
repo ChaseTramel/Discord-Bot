@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import schedule
 
@@ -27,28 +27,43 @@ def saveLastPosts(data):
     with open(STATE_PATH, 'w') as f:
         json.dump(data, f)
 
-
-
-from datetime import datetime
-
+PLATFORM_STYLE = {
+    "Ghost": {
+        "color": 0xF6F6F6,
+        "icon": "https://ghost.org/images/ghost-orb-1.png"
+    },
+    "Mastodon": {
+        "color": 0x6364FF,
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/4/48/Mastodon_Logotype_%28Simple%29.svg"
+    },
+    "Reddit": {
+        "color": 0xFF4500,
+        "icon": "https://www.redditinc.com/assets/images/site/reddit-logo.png"
+    },
+    "Bluesky": {
+        "color": 0x4C9EEB,
+        "icon": "https://bsky.app/favicon.ico"
+    }
+}
 
 def buildEmbed(platform, title=None, url=None, description=None, image=None):
+    style = PLATFORM_STYLE.get(platform, {})
     embed = {
         "title": title or f"New {platform} Post",
-        "description": description or f"Check out the latest {platform} post!",
         "url": url,
-        "timestamp": datetime.utcnow().isoformat(),
+        "description": description or f"Check out the latest {platform} post!",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "footer": {
-            "text": f"Posted via {platform}"
-        }
+            "text": f"Posted via {platform}",
+            "icon_url": style.get("icon")
+        },
+        "color": style.get("color", 0xCCCCCC)
     }
 
     if image:
         embed["thumbnail"] = {"url": image}
 
     return embed
-
-
 
 def postDiscord(webhook_url, platform, url, title=None, description=None, image=None):
     import requests
@@ -59,8 +74,8 @@ def postDiscord(webhook_url, platform, url, title=None, description=None, image=
             "content": f"I posted on **{platform}**. Go like, comment, and share, if you will!",
             "embeds": [embed]
         }
-    
-        import jsonprint("Sending to Discord:\n", json.dumps(data, indent=2))
+
+        print("Sending to Discord:\n", json.dumps(data, indent=2))
 
         response = requests.post(webhook_url, json=data)
         if response.status_code not in [200, 204]:
@@ -68,30 +83,40 @@ def postDiscord(webhook_url, platform, url, title=None, description=None, image=
     except Exception as e:
         print(f"Discord error: {e}")
 
-
-
-
 def checkAll():
     config = loadConfig()
     last = loadLastPosts()
-
     updated = False
 
     for name, module in {
         "Ghost": ghost,
-        "Mastodon": mastodon,
-        "Reddit": reddit,
-        "Bluesky": bluesky
+        # "Mastodon": mastodon,
+        # "Reddit": reddit,
+        # "Bluesky": bluesky
     }.items():
         try:
-            url = module.get_latest_post(config[name.lower()], last.get(name))
-            if url:
-                postDiscord(config["discord_webhook"], name, url)
+            result = module.get_latest_post(config[name.lower()], last.get(name))
+            print(f"Result from {name}: {result}")
+
+            if result:
+                if isinstance(result, tuple):
+                    url, title, description, image = result
+                else:
+                    url, title, description, image = result, None, None, None
+
+                postDiscord(config["discord_webhook"], name, url, title, description, image)
                 last[name] = url
                 updated = True
+                logging.info(f"Posted {name} update: {url}")
         except Exception as e:
             logging.error(f"{name} error: {e}")
-            postDiscord(config["discord_webhook"], "Error", f"❗ Error fetching {name}: {e}")
+            postDiscord(
+                config["discord_webhook"],
+                name,
+                url=config["ghost"]["url"],  # fallback to Ghost URL just to pass validation
+                title=f"❗ Error fetching {name}",
+                description=str(e)
+            )
 
     if updated:
         saveLastPosts(last)
